@@ -2,9 +2,9 @@
 import streamlit as s
 from utils import fake_delay, glitch_text
 
-# AI GEBRUIKT VOOR DE CSS SUPERCOMPUTER!!!
+# CSS voor de supercomputer look
 def inject_theme_css():
-    str.markdown("""
+    s.markdown("""
     <style>
     body { background-color: #05060a; color: #c7ffd9; }
     </style>
@@ -21,9 +21,8 @@ def system_boot():
         "GPU MODULES .... ONLINE",
         "SYSTEM STABILITY SEVERE",
     ]
-    # EINDE AI
 
-    # Elke lijn in de log fake delay en schrijf antwoord 
+    # Elke lijn in de log fake delay en schrijf antwoord
     for line in logs:
         fake_delay()
         s.write(glitch_text(line))
