@@ -1,6 +1,6 @@
 # Importeren van streamlit ui comps en ai_engine
 import streamlit as s
-from ui_components import inject_theme_css, system_boot
+from ui_components import inject_theme_css, hud_header, system_boot, streaming_console, render_ai_output_as_console
 from ai_engine import generate_build
 
 # Basics voor streamlit
@@ -13,13 +13,15 @@ s.set_page_config(
 # Laad de opmaak
 inject_theme_css()
 
-s.title("🟥 ZOD-78 SIMULATION TERMINAL")
-s.caption("STATUS: SEVERE")
+hud_header()
 
-# Laat het systeem aan gaan
+s.title("🟥 ZOD-78 SIMULATION TERMINAL")
+s.caption("STATUS: SEVERE • OPERATOR ACCESS: LIMITED • YEAR: 3060")
+
+# Laat het systeem "aan gaan"
 system_boot()
 
-# Siders en selectboxen
+# Opmaal
 with s.sidebar:
     budget = s.slider("Budget (€)", 500, 3000, 1200, 50)
     resolution = s.selectbox("Resolutie", ["1080p", "1440p", "4K"])
@@ -36,8 +38,47 @@ games = s.multiselect(
     default=["War Thunder"]
 )
 
+# Control panel knoppen (voelt als echte machine knoppen)
+c1, c2, c3, c4 = s.columns(4)
+
+with c1:
+    arm = s.button("ARM")
+with c2:
+    calibrate = s.button("CALIBRATE")
+with c3:
+    run = s.button("RUN SIM")
+with c4:
+    abort = s.button("ABORT")
+
+if abort:
+    streaming_console([
+        "<span class='err'>[ABORT]</span> OPERATOR INTERRUPT RECEIVED",
+        "<span class='amb'>[WARN]</span> COOLANT LOOP STABILIZING…",
+        "<span class='ok'>[OK]</span>   CORE TEMPERATURE DROPPING",
+    ])
+    s.stop()
+
+if calibrate:
+    streaming_console([
+        "<span class='inf'>[CAL]</span>  ALIGNING SENSOR ARRAY…",
+        "<span class='ok'>[OK]</span>   CLOCK DOMAIN LOCKED",
+        "<span class='amb'>[WARN]</span> COOLANT NOISE STILL PRESENT",
+    ])
+
 # Start simulatie
-if s.button("RUN SIMULATION"):
+if run:
+    if not games:
+        streaming_console(["<span class='err'>[CRIT]</span> NO WORKLOAD SELECTED"])
+        s.stop()
+
+    streaming_console([
+        "<span class='inf'>[SIM]</span>  BUILD MATRIX: CONSTRUCT",
+        "<span class='inf'>[SIM]</span>  GPU/CPU BALANCE: SOLVING",
+        "<span class='amb'>[WARN]</span> OPERATOR EXPECTATIONS: HIGH",
+        "<span class='err'>[CRIT]</span> STABILITY WINDOW: NARROW",
+        "<span class='ok'>[OK]</span>   OUTPUT CHANNEL: READY",
+    ])
+
     data = {
         "budget": budget,
         "resolution": resolution,
@@ -49,7 +90,6 @@ if s.button("RUN SIMULATION"):
     with s.spinner("SIMULATION RUNNING..."):
         output = generate_build(data)
 
-    # Toon "console achtige" output
-    s.markdown("```text")
-    s.write(output)
-    s.markdown("```")
+    # Toon "console achtige" output (mooier)
+    s.subheader("OUTPUT / TELEMETRY DUMP")
+    render_ai_output_as_console(output)
