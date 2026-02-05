@@ -1,28 +1,35 @@
-# Os voor overal stabiel te werken
+# OS voor stabiliteit op alle platformen
 import os
-# Import AI 
 import cohere
-# Prompt builder importen
 from prompts import build_prompt
 
-# Haalt de Cohere API client op
 def get_client():
-    api_key = os.getenv("COHERE_API_KEY")
-
+    api_key = os.getenv("COHERE_API_KEY", "").strip()
     if not api_key:
-        raise RuntimeError("COHERE_API_KEY ontbreekt")
-
+        raise RuntimeError("COHERE_API_KEY ontbreekt (Streamlit Secrets of lokaal env var).")
     return cohere.Client(api_key)
 
-# Stuur data naar Cohere en ontvang het antwoord
 def generate_build(data):
     client = get_client()
     prompt = build_prompt(data)
 
-    response = client.chat(
-        model="command",
-        message=prompt,
-        temperature=0.55,
-    )
+    # Gebruik "live" model IDs (command en command-r alias zijn deprecated)
+    model_candidates = [
+        "command-r-08-2024",
+        "command-a-03-2025",
+    ]
 
-    return response.text
+    last_error = None
+    for model_name in model_candidates:
+        try:
+            resp = client.chat(
+                model=model_name,
+                message=prompt,
+                temperature=0.55,
+            )
+            return resp.text
+        except Exception as e:
+            last_error = e
+
+    # Als geen enkel model werkt, geef de laatste fout door
+    raise RuntimeError(f"Cohere model call failed. Last error: {last_error}")
