@@ -20,7 +20,7 @@ def generate_build(data):
     prompt = build_prompt(data)
 
     response = client.chat(
-        model="command-r",
+        model="command",
         message=prompt,
         temperature=0.55,
     )
