@@ -41,10 +41,7 @@ games = s.multiselect(
 # Control panel knoppen (voelt als echte machine knoppen)
 c1, c2, c3, c4 = s.columns(4)
 
-with c1:
-    arm = s.button("ARM")
-with c2:
-    calibrate = s.button("CALIBRATE")
+
 with c3:
     run = s.button("RUN SIM")
 with c4:
@@ -58,12 +55,7 @@ if abort:
     ])
     s.stop()
 
-if calibrate:
-    streaming_console([
-        "<span class='inf'>[CAL]</span>  ALIGNING SENSOR ARRAY…",
-        "<span class='ok'>[OK]</span>   CLOCK DOMAIN LOCKED",
-        "<span class='amb'>[WARN]</span> COOLANT NOISE STILL PRESENT",
-    ])
+
 
 # Start simulatie
 if run:
